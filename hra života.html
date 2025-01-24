@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hra života</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #333;
+            color: white;
+        }
+
+        table {
+            margin: 20px auto;
+            border-collapse: collapse;
+        }
+
+        td {
+            width: 20px;
+            height: 20px;
+            border: 1px solid #555;
+        }
+
+        td.dead {
+            background-color: black;
+        }
+
+        td.live {
+            background-color: white;
+        }
+
+        button {
+            padding: 10px;
+            margin: 10px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <h1>Hra života</h1>
+    <div id="gridContainer"></div>
+    <div>
+        <button id="start">Start</button>
+        <button id="clear">Vymazat</button>
+        <button id="random">Náhodně</button>
+    </div>
+
+    <script>
+        var rows = 20;
+        var cols = 20;
+        var playing = false;
+        var grid = Array.from({ length: rows }, () => Array(cols).fill(0));
+        var nextGrid = Array.from({ length: rows }, () => Array(cols).fill(0));
+        var interval;
+
+        // Inicializace hry
+        window.onload = function () {
+            createTable();
+            setupControls();
+        };
+
+        // Vytvoření tabulky (UI)
+        function createTable() {
+            let gridContainer = document.getElementById("gridContainer");
+            let table = document.createElement("table");
+
+            for (let i = 0; i < rows; i++) {
+                let tr = document.createElement("tr");
+                for (let j = 0; j < cols; j++) {
+                    let cell = document.createElement("td");
+                    cell.setAttribute("id", i + "_" + j);
+                    cell.setAttribute("class", "dead");
+                    cell.addEventListener("click", toggleCell);
+                    tr.appendChild(cell);
+                }
+                table.appendChild(tr);
+            }
+            gridContainer.appendChild(table);
+        }
+
+        // Přepínání buněk kliknutím
+        function toggleCell() {
+            let coords = this.id.split("_");
+            let row = parseInt(coords[0]);
+            let col = parseInt(coords[1]);
+
+            if (grid[row][col] === 0) {
+                this.setAttribute("class", "live");
+                grid[row][col] = 1;
+            } else {
+                this.setAttribute("class", "dead");
+                grid[row][col] = 0;
+            }
+        }
+
+        // Nastavení ovládacích prvků
+        function setupControls() {
+            document.getElementById("start").addEventListener("click", startStop);
+            document.getElementById("clear").addEventListener("click", clearGrid);
+            document.getElementById("random").addEventListener("click", randomizeGrid);
+        }
+
+        // Spuštění/zastavení hry
+        function startStop() {
+            if (playing) {
+                clearInterval(interval);
+                playing = false;
+                document.getElementById("start").innerText = "Start";
+            } else {
+                interval = setInterval(runGame, 300);
+                playing = true;
+                document.getElementById("start").innerText = "Stop";
+            }
+        }
+
+        // Vymazání mřížky
+        function clearGrid() {
+            clearInterval(interval);
+            playing = false;
+            document.getElementById("start").innerText = "Start";
+            for (let i = 0; i < rows; i++) {
+                for (let j = 0; j < cols; j++) {
+                    grid[i][j] = 0;
+                    document.getElementById(i + "_" + j).setAttribute("class", "dead");
+                }
+            }
+        }
+
+        // Hlavní logika hry
+        function runGame() {
+            for (let i = 0; i < rows; i++) {
+                for (let j = 0; j < cols; j++) {
+                    let neighbors = countNeighbors(i, j);
+                    if (grid[i][j] === 1) {
+                        nextGrid[i][j] = (neighbors === 2 || neighbors === 3) ? 1 : 0;
+                    } else {
+                        nextGrid[i][j] = (neighbors === 3) ? 1 : 0;
+                    }
+                }
+            }
+            updateGrid();
+        }
+
+        // Počítání sousedů
+        function countNeighbors(row, col) {
+            let count = 0;
+            for (let i = -1; i <= 1; i++) {
+                for (let j = -1; j <= 1; j++) {
+                    if (i === 0 && j === 0) continue;
+                    let newRow = row + i, newCol = col + j;
+                    if (newRow >= 0 && newRow < rows && newCol >= 0 && newCol < cols) {
+                        count += grid[newRow][newCol];
+                    }
+                }
+            }
+            return count;
+        }
+
+        // Aktualizace mřížky podle nového stavu
+        function updateGrid() {
+            for (let i = 0; i < rows; i++) {
+                for (let j = 0; j < cols; j++) {
+                    grid[i][j] = nextGrid[i][j];
+                    document.getElementById(i + "_" + j).setAttribute("class", grid[i][j] ? "live" : "dead");
+                }
+            }
+        }
+
+        // Náhodné rozmístění buněk
+        function randomizeGrid() {
+            for (let i = 0; i < rows; i++) {
+                for (let j = 0; j < cols; j++) {
+                    let randomValue = Math.random() > 0.5 ? 1 : 0;
+                    grid[i][j] = randomValue;
+                    document.getElementById(i + "_" + j).setAttribute("class", randomValue ? "live" : "dead");
+                }
+            }
+        }
+    </script>
+</body>
+</html>

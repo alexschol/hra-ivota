@@ -1,0 +1,62 @@
+body {
+  font-family: Arial, sans-serif;
+  text-align: center;
+  background-color: #333;
+  color: white;
+}
+
+#gridContainer {
+  margin: 20px auto;
+  display: inline-block;
+}
+
+table {
+  border-collapse: collapse;
+}
+
+td {
+  width: 20px;
+  height: 20px;
+  border: 1px solid #555;
+}
+
+td.dead {
+  background-color: black;
+}
+
+td.live {
+  background-color: white;
+}
+
+.controls {
+  margin-top: 20px;
+}
+
+button {
+  padding: 10px 20px;
+  margin: 5px;
+  font-size: 18px;
+  cursor: pointer;
+}
+canvas {
+  width: 100%;
+  height: auto;
+  max-width: 100vw;
+  max-height: 100vh;
+}
+.cell {
+  width: 20px;
+  height: 20px;
+  border: 1px solid #ccc;
+  display: inline-block;
+}
+.small .cell {
+  width: 10px;
+  height: 10px;
+}
+.large .cell {
+  width: 30px;
+  height: 30px;
+}
+
+  
